@@ -1,6 +1,7 @@
 plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
+    id("org.jetbrains.kotlin.kapt") // Добавляем плагин kapt
 }
 
 android {
@@ -47,7 +48,7 @@ dependencies {
     // База данных Room
     implementation("androidx.room:room-runtime:2.6.1")
     implementation("androidx.room:room-ktx:2.6.1")
-    annotationProcessor("androidx.room:room-compiler:2.6.1")
+    kapt("androidx.room:room-compiler:2.6.1") // Меняем annotationProcessor на kapt
     
     // Compose зависимости (ЭТО БЫЛО УДАЛЕНО - ВОЗВРАЩАЕМ)
     implementation(platform("androidx.compose:compose-bom:2024.02.00"))
