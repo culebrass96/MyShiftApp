@@ -33,10 +33,11 @@ dependencies {
     implementation("androidx.core:core-ktx:1.12.0")
     implementation("androidx.appcompat:appcompat:1.6.1")
     implementation("com.google.android.material:material:1.11.0")
-}
-    // База данных Room
+// База данных Room
     implementation("androidx.room:room-runtime:2.6.1")
     implementation("androidx.room:room-ktx:2.6.1")
     annotationProcessor("androidx.room:room-compiler:2.6.1")
     // Для работы с датами
     implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.6.0")
+}
+    
