@@ -1,6 +1,8 @@
 plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
+    // Добавляем плагин для Compose
+    id("org.jetbrains.kotlin.plugin.compose") version "1.9.22"
 }
 
 android {
