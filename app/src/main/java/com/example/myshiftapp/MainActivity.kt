@@ -190,20 +190,84 @@ fun ShiftCard(shift: ShiftEntity) {
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AddShiftDialog(onDismiss: () -> Unit, onAdd: (String, String, String) -> Unit) {
     var date by remember { mutableStateOf("2026-11-24") }
     var type by remember { mutableStateOf("День") }
     var time by remember { mutableStateOf("08:00 - 20:00") }
+    var showDatePicker by remember { mutableStateOf(false) }
+
+    // Автоматическая подстановка времени при смене типа
+    LaunchedEffect(type) {
+        time = when (type) {
+            "День" -> "08:00 - 20:00"
+            "Ночь" -> "20:00 - 08:00"
+            "Выходной" -> ""
+            "Отсыпной" -> ""
+            else -> ""
+        }
+    }
+
+    if (showDatePicker) {
+        val datePickerState = rememberDatePickerState()
+        DatePickerDialog(
+            onDismissRequest = { showDatePicker = false },
+            confirmButton = {
+                TextButton(onClick = {
+                    datePickerState.selectedDateMillis?.let {
+                        val instant = java.time.Instant.ofEpochMilli(it)
+                        val formatter = java.time.format.DateTimeFormatter.ofPattern("yyyy-MM-dd")
+                            .withZone(java.time.ZoneId.systemDefault())
+                        date = formatter.format(instant)
+                    }
+                    showDatePicker = false
+                }) { Text("OK") }
+            },
+            dismissButton = {
+                TextButton(onClick = { showDatePicker = false }) { Text("Отмена") }
+            }
+        ) {
+            DatePicker(state = datePickerState)
+        }
+    }
 
     AlertDialog(
         onDismissRequest = onDismiss,
         title = { Text("Новая смена") },
         text = {
             Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                OutlinedTextField(value = date, onValueChange = { date = it }, label = { Text("Дата (ГГГГ-ММ-ДД)") })
-                OutlinedTextField(value = type, onValueChange = { type = it }, label = { Text("Тип (День/Ночь/Выходной)") })
-                OutlinedTextField(value = time, onValueChange = { time = it }, label = { Text("Время (08:00 - 20:00)") })
+                // Поле даты с кнопкой выбора
+                OutlinedTextField(
+                    value = date,
+                    onValueChange = {},
+                    readOnly = true,
+                    label = { Text("Дата") },
+                    trailingIcon = {
+                        IconButton(onClick = { showDatePicker = true }) {
+                            Icon(Icons.Default.DateRange, contentDescription = "Выбрать дату")
+                        }
+                    }
+                )
+
+                // Выбор типа смены кнопками
+                Text("Тип смены:", fontWeight = FontWeight.Medium)
+                Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+                    listOf("День", "Ночь", "Выходной", "Отсыпной").forEach { t ->
+                        FilterChip(
+                            selected = type == t,
+                            onClick = { type = t },
+                            label = { Text(t) }
+                        )
+                    }
+                }
+
+                // Время (автоматически, но можно и изменить)
+                OutlinedTextField(
+                    value = time,
+                    onValueChange = { time = it },
+                    label = { Text("Время") }
+                )
             }
         },
         confirmButton = {
